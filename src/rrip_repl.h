@@ -14,8 +14,7 @@ struct TreeNode {
 };
 
 struct TreeNode** create_tree(uint64_t _leaves)
-{
-    
+{    
     uint64_t count = 0;
     uint64_t node_position = 0;
     uint64_t node_size = _leaves * 2 - 1; 
@@ -104,12 +103,12 @@ class PLRUReplPolicy : public ReplPolicy{
         
         void update(uint32_t id, const MemReq* req){
             TreeNode* current = leaf_array[id];
-            while(current != NULL){
+            while(current->parent != NULL){
                 if(current->is_left == true){
-                    current->plru_bit = 1;                    
+                    current->parent->plru_bit = 1;                    
                 }
                 else{
-                    current->plru_bit = 0;
+                    current->parent->plru_bit = 0;
                 }
                 current = current -> parent;
             }            
@@ -146,9 +145,7 @@ class PLRUReplPolicy : public ReplPolicy{
         }
         
         DECL_RANK_BINDINGS;
-        
-
-    
+           
     
 };
 

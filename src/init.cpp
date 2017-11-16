@@ -159,6 +159,8 @@ BaseCache* BuildCacheBank(Config& config, const string& prefix, g_string& name, 
         ProfViolReplPolicy< LRUReplPolicy<true> >* pvrp = new ProfViolReplPolicy< LRUReplPolicy<true> >(numLines);
         pvrp->init(numLines);
         rp = pvrp;
+    } else if (replType == "TreePLRU"){
+        rp = new PLRUReplPolicy(numLines, numSets);
     } else if (replType == "TreeLRU") {
         rp = new TreeLRUReplPolicy(numLines, candidates);
     } else if (replType == "NRU") {
