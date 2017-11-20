@@ -60,6 +60,7 @@ struct TreeNode** create_tree(uint64_t _leaves)
 }
 
 int *get_bits(int n){
+
     int value = n;
     int count = 0;
     while (value > 0) {
@@ -76,10 +77,12 @@ int *get_bits(int n){
         bits[k] = thebit;
       }
       return bits;
+
 }
 
 
 int set_index(TreeNode* p, int x){
+
     int *bit =get_bits(x);
     int i = 0;
     TreeNode* tmp = p;
@@ -98,10 +101,12 @@ int set_index(TreeNode* p, int x){
         tmp = tmp -> parent;
         i++;
     }
+
     return x;
 }
 
 int find_index(TreeNode* p){
+
     int x = 0;
     int i = 0;
     TreeNode* tmp = p;
@@ -119,19 +124,9 @@ int find_index(TreeNode* p){
         tmp = tmp -> parent;
         i++;
     }
+
     return x;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 class MDPPPolicy : public ReplPolicy{
@@ -147,6 +142,7 @@ class MDPPPolicy : public ReplPolicy{
         
     public:
         explicit MDPPPolicy(uint32_t _numLines, uint32_t _set)  {
+
             set = _set;
             numLines =_numLines;
             root_array = gm_calloc<TreeNode*>(set);
@@ -165,50 +161,60 @@ class MDPPPolicy : public ReplPolicy{
                     }                    
                 }
             }
-            
-            position_array = (int*)malloc(sizeof(int) * leaf_size);
+
+            position_array = gm_calloc<int>(leaf_size);
             int p_div = leaf_size / 2;
             int p_counter = 0;
             int p_pos = 0;
+            
             while(p_div != 1){
                 position_array[p_counter] = p_pos;
                 p_counter++;
                 p_pos++;
-                if(p_div == p_counter){
+                if(p_div == p_pos){
                     p_pos = 0;
                     p_div = p_div / 2;
                 }                
-            }            
+            }  
+          
+            
         }
         
         ~MDPPPolicy() {
             gm_free(root_array);
+            gm_free(leaf_array);
+            gm_free(position_array);
         }
-        
-        
-        
+               
         
         void update(uint32_t id, const MemReq* req){
+
             TreeNode* current = leaf_array[id];
             if(current-> plru_bit == 2){
-                set_index(current, place_pos);              
+                set_index(current, place_pos);  
+                current-> plru_bit = 0;                 
             }
             else{
-                int index = position_array[find_index(current)];
-                set_index(current,index);
+                int current_index = find_index(current);
+                int new_index = position_array[current_index];
+                set_index(current,new_index);
             }
+
         }
         
         void replaced(uint32_t id) {
+
             TreeNode* current = leaf_array[id];
             current-> plru_bit = 2;
+
         }
         
         template <typename C> inline uint32_t rank(const MemReq* req, C cands) {
+
             uint32_t bestCand = -1;
             auto ci = cands.begin();
-            uint32_t set = ((*ci)/ leaf_size);
-            TreeNode* current_node = root_array[set];
+            uint32_t current_set = ((*ci)/ leaf_size);
+            TreeNode* current_node = root_array[current_set];
             while(current_node->left != NULL){
                 if(current_node->plru_bit == 1){
                     current_node = current_node -> right;
@@ -222,6 +228,7 @@ class MDPPPolicy : public ReplPolicy{
                     bestCand = i;
                 }                
             }
+
             return bestCand;
         }
         
@@ -295,8 +302,8 @@ class PLRUReplPolicy : public ReplPolicy{
         template <typename C> inline uint32_t rank(const MemReq* req, C cands) {
             uint32_t bestCand = -1;
             auto ci = cands.begin();
-            uint32_t set = ((*ci)/ leaf_size);
-            TreeNode* current_node = root_array[set];
+            uint32_t current_set = ((*ci)/ leaf_size);
+            TreeNode* current_node = root_array[current_set];
             while(current_node->left != NULL){
                 if(current_node->plru_bit == 1){
                     current_node = current_node -> right;

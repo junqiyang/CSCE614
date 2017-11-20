@@ -161,6 +161,8 @@ BaseCache* BuildCacheBank(Config& config, const string& prefix, g_string& name, 
         rp = pvrp;
     } else if (replType == "TreePLRU"){
         rp = new PLRUReplPolicy(numLines, numSets);
+    } else if (replType == "MDPP") {
+        rp = new MDPPPolicy(numLines, numSets);
     } else if (replType == "TreeLRU") {
         rp = new TreeLRUReplPolicy(numLines, candidates);
     } else if (replType == "NRU") {
