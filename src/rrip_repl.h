@@ -60,15 +60,13 @@ struct TreeNode** create_tree(uint64_t _leaves)
 }
 
 int *get_bits(int n){
-
     int value = n;
     int count = 0;
     while (value > 0) {
         count++;
         value = value >> 1;
     }
-      int *bits = (int*)malloc(sizeof(int) * count);
-
+      int *bits = gm_calloc<int>(count);
       int k;
       for(k=0; k<count; k++){
         int mask =  1 << k;
@@ -77,12 +75,10 @@ int *get_bits(int n){
         bits[k] = thebit;
       }
       return bits;
-
 }
 
 
 int set_index(TreeNode* p, int x){
-
     int *bit =get_bits(x);
     int i = 0;
     TreeNode* tmp = p;
@@ -101,12 +97,10 @@ int set_index(TreeNode* p, int x){
         tmp = tmp -> parent;
         i++;
     }
-
     return x;
 }
 
 int find_index(TreeNode* p){
-
     int x = 0;
     int i = 0;
     TreeNode* tmp = p;
@@ -124,7 +118,6 @@ int find_index(TreeNode* p){
         tmp = tmp -> parent;
         i++;
     }
-
     return x;
 }
 
@@ -145,12 +138,17 @@ class MDPPPolicy : public ReplPolicy{
 
             set = _set;
             numLines =_numLines;
-            root_array = gm_calloc<TreeNode*>(set);
-            leaf_size = numLines / set;            
-            leaf_array = gm_calloc<TreeNode*>(numLines);
+            
+            leaf_size = numLines / set;  
             node_size = leaf_size * 2 - 1;
+            
+            uint32_t counter = 0;            
+            root_array = gm_calloc<TreeNode*>(set);                      
+            leaf_array = gm_calloc<TreeNode*>(numLines);            
             place_pos = (int)((leaf_size/4)*3);
-            uint32_t counter = 0;
+            
+            
+
             for(uint64_t i = 0;i < set;i++){
                 TreeNode** temp = create_tree(leaf_size);
                 root_array[i] = temp[0];
@@ -175,7 +173,7 @@ class MDPPPolicy : public ReplPolicy{
                     p_pos = 0;
                     p_div = p_div / 2;
                 }                
-            }  
+            }   
           
             
         }
@@ -188,25 +186,15 @@ class MDPPPolicy : public ReplPolicy{
                
         
         void update(uint32_t id, const MemReq* req){
-
             TreeNode* current = leaf_array[id];
-            if(current-> plru_bit == 2){
-                set_index(current, place_pos);  
-                current-> plru_bit = 0;                 
-            }
-            else{
-                int current_index = find_index(current);
-                int new_index = position_array[current_index];
-                set_index(current,new_index);
-            }
-
+            int current_index = find_index(current);
+            int new_index = position_array[current_index];
+            set_index(current,new_index);
         }
         
         void replaced(uint32_t id) {
-
             TreeNode* current = leaf_array[id];
-            current-> plru_bit = 2;
-
+            set_index(current, place_pos);
         }
         
         template <typename C> inline uint32_t rank(const MemReq* req, C cands) {
@@ -215,6 +203,7 @@ class MDPPPolicy : public ReplPolicy{
             auto ci = cands.begin();
             uint32_t current_set = ((*ci)/ leaf_size);
             TreeNode* current_node = root_array[current_set];
+            
             while(current_node->left != NULL){
                 if(current_node->plru_bit == 1){
                     current_node = current_node -> right;
@@ -223,12 +212,12 @@ class MDPPPolicy : public ReplPolicy{
                     current_node = current_node -> left;
                 }                
             }
+            
             for(uint32_t i=0;i<leaf_size*set;i++){
                 if(leaf_array[i] == current_node){
                     bestCand = i;
                 }                
             }
-
             return bestCand;
         }
         
