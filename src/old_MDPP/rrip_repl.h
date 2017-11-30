@@ -196,7 +196,7 @@ class MDPPPolicy : public ReplPolicy{
                 int new_index = position_array[current_index];
                 set_index(current,new_index);
             }
-            
+            //This is paper's version for placement, always place at 3/4 of the tree leaves
             
             /*
             

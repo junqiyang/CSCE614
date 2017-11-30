@@ -12,6 +12,8 @@ struct TreeNode {
     TreeNode *right;  // Pointer to the right subtree.
 };
 
+
+//create trees based on the number of tree leaves
 struct TreeNode** create_tree(uint64_t _leaves)
 {    
     uint64_t count = 0;
@@ -58,7 +60,7 @@ struct TreeNode** create_tree(uint64_t _leaves)
     }   
     return node_array;   
 }
-
+//translate integer into binary bit
 int *get_bits(int n){
     int value = n;
     int count = 0;
@@ -77,7 +79,7 @@ int *get_bits(int n){
       return bits;
 }
 
-
+//directly from the Code offered in the paper
 int set_index(TreeNode* p, int x){
     int *bit =get_bits(x);
     int i = 0;
@@ -196,16 +198,9 @@ class MDPPPolicy : public ReplPolicy{
                 int current_index = find_index(current);
                 int new_index = position_array[current_index];
                 set_index(current,new_index);
-            }
-            
-            
-            */
-            
-            
-            
-            
-            
-            
+            }           
+            */    
+            //the MDPP we modified will directly place the new coming blcok into position 0 instead of 3/4 of the tree.
             TreeNode* current = leaf_array[id];
             int current_index = find_index(current);
             int new_index = position_array[current_index];
@@ -223,7 +218,7 @@ class MDPPPolicy : public ReplPolicy{
         }
         
         template <typename C> inline uint32_t rank(const MemReq* req, C cands) {
-
+//find the candiate by PLRE rule
             uint32_t bestCand = -1;
             auto ci = cands.begin();
             uint32_t current_set = ((*ci)/ leaf_size);
