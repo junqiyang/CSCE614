@@ -187,15 +187,38 @@ class MDPPPolicy : public ReplPolicy{
         
         void update(uint32_t id, const MemReq* req){
             TreeNode* current = leaf_array[id];
+            if(current-> plru_bit == 2){
+                set_index(current, place_pos);  
+                current-> plru_bit = 0;                 
+            }
+            else{
+                int current_index = find_index(current);
+                int new_index = position_array[current_index];
+                set_index(current,new_index);
+            }
+            
+            
+            /*
+            
+            
+            
+            
+            
+            
+            TreeNode* current = leaf_array[id];
             int current_index = find_index(current);
             int new_index = position_array[current_index];
             set_index(current,new_index);
+            */
         }
         
         void replaced(uint32_t id) {
             TreeNode* current = leaf_array[id];
+            current-> plru_bit = 2;
+            /*
+            TreeNode* current = leaf_array[id];
             set_index(current, place_pos);
-        }
+        */}
         
         template <typename C> inline uint32_t rank(const MemReq* req, C cands) {
 
